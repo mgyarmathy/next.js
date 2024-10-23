@@ -663,8 +663,10 @@ async fn chunk_content_internal_parallel(
         match graph_node {
             ChunkContentGraphNode::PassthroughChunkItem { .. } => {}
             ChunkContentGraphNode::TracedModule { module } => {
-                let module = module.resolve().await?;
-                traced_modules.insert(module);
+                if *chunking_context.is_tracing_enabled().await? {
+                    let module = module.resolve().await?;
+                    traced_modules.insert(module);
+                }
             }
             ChunkContentGraphNode::ChunkItem { item, .. } => {
                 chunk_items.insert(item);

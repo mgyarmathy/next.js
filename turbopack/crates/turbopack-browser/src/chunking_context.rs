@@ -43,6 +43,11 @@ impl BrowserChunkingContextBuilder {
         self
     }
 
+    pub fn tracing(mut self, enable_tracing: bool) -> Self {
+        self.chunking_context.enable_tracing = enable_tracing;
+        self
+    }
+
     pub fn asset_base_path(mut self, asset_base_path: Vc<Option<RcStr>>) -> Self {
         self.chunking_context.asset_base_path = asset_base_path;
         self
@@ -121,6 +126,8 @@ pub struct BrowserChunkingContext {
     asset_base_path: Vc<Option<RcStr>>,
     /// Enable HMR for this chunking
     enable_hot_module_replacement: bool,
+    /// Enable tracing for this chunking
+    enable_tracing: bool,
     /// The environment chunks will be evaluated in.
     environment: Vc<Environment>,
     /// The kind of runtime to include in the output.
@@ -156,6 +163,7 @@ impl BrowserChunkingContext {
                 chunk_base_path: Default::default(),
                 asset_base_path: Default::default(),
                 enable_hot_module_replacement: false,
+                enable_tracing: false,
                 environment,
                 runtime_type,
                 minify_type: MinifyType::NoMinify,
@@ -348,6 +356,11 @@ impl ChunkingContext for BrowserChunkingContext {
     #[turbo_tasks::function]
     fn is_hot_module_replacement_enabled(&self) -> Vc<bool> {
         Vc::cell(self.enable_hot_module_replacement)
+    }
+
+    #[turbo_tasks::function]
+    fn is_tracing_enabled(&self) -> Vc<bool> {
+        Vc::cell(self.enable_tracing)
     }
 
     #[turbo_tasks::function]
